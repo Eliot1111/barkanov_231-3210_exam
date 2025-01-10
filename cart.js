@@ -47,6 +47,10 @@ function fetchGoodById(id) {
         });
 }
 
+
+
+
+
 function renderCartItems() {
     const cart = getCart();
     if (cart.length === 0) {
@@ -166,6 +170,19 @@ orderForm.addEventListener('submit', (e) => {
             showNotification(err.message);
         });
 });
+
+
+function deleteOrder(orderId) {
+    return fetch(`https://edu.std-900.ist.mospolytech.ru/exam-2024-1/api/orders/${orderId}?api_key=${API_KEY}`, {
+        method: 'DELETE'
+    })
+        .then((res) => {
+            if (!res.ok) {
+                throw new Error(`Ошибка при удалении заказа ID=${orderId}: ${res.status} ${res.statusText}`);
+            }
+            return res.json();
+        });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     renderCartItems();

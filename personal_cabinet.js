@@ -25,9 +25,9 @@ function fetchOrders() {
         });
 }
 
+
 function renderOrders(orders) {
     ordersTableBody.innerHTML = '';
-
     if (!orders || orders.length === 0) {
         ordersTableBody.innerHTML = `
       <tr>
@@ -36,13 +36,12 @@ function renderOrders(orders) {
     `;
         return;
     }
-
     orders.forEach((order, idx) => {
         const subscribeText = order.subscribe ? 'Да' : 'Нет';
-        const goodsStr = (order.good_ids && order.good_ids.length)
-            ? order.good_ids.join(', ')
-            : '';
-
+        const goodsStr =
+            Array.isArray(order.good_ids) && order.good_ids.length
+                ? order.good_ids.join(', ')
+                : '';
         const tr = document.createElement('tr');
         tr.innerHTML = `
       <td>${idx + 1}</td>

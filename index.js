@@ -1,19 +1,27 @@
 const API_KEY = 'd9802522-5f6a-46bd-a5f2-1679eab9e140';
 const GOODS_URL = 'https://edu.std-900.ist.mospolytech.ru/exam-2024-1/api/goods';
+
+// Основные элементы
 const goodsContainer = document.getElementById('goodsContainer');
 const notificationArea = document.getElementById('notification-area');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
 const sortSelect = document.getElementById('sortSelect');
+const searchForm = document.getElementById('searchForm');          // Форма поиска
+const searchInput = document.getElementById('searchInput');        // Поле ввода поиска
+
+// Фильтры (sidebar)
 const sidebarCategoriesContainer = document.getElementById('sidebarCategories');
 const priceFromInput = document.getElementById('priceFrom');
 const priceToInput = document.getElementById('priceTo');
 const discountOnlyCheckbox = document.getElementById('discountOnly');
 const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
+// Параметры
 let currentPage = 1;
 const perPage = 100;
 let allGoods = [];
 
+// Вывод уведомлений
 function showNotification(message) {
     notificationArea.textContent = message;
     notificationArea.style.display = 'block';
@@ -21,9 +29,10 @@ function showNotification(message) {
         notificationArea.style.display = 'none';
     }, 3000);
 }
-function fetchAllGoods() {
-    const url = `${GOODS_URL}?api_key=${API_KEY}&page=1&per_page=${perPage}`;
 
+// Запрос товаров
+function fetchAllGoods(query = '') {
+    const url = `${GOODS_URL}?api_key=${API_KEY}&page=1&per_page=${perPage}&query=${encodeURIComponent(query)}`;
     return fetch(url)
         .then((res) => {
             if (!res.ok) {
@@ -35,7 +44,6 @@ function fetchAllGoods() {
             if (!data.goods || !Array.isArray(data.goods)) {
                 throw new Error('Сервер вернул не массив goods');
             }
-
             allGoods = data.goods;
             generateCategoryCheckboxes(allGoods);
             renderGoods(allGoods);
@@ -46,12 +54,11 @@ function fetchAllGoods() {
         });
 }
 
+// Генерация чекбоксов категорий
 function generateCategoryCheckboxes(goods) {
-    console.log('Список товаров:', goods);
-
+    sidebarCategoriesContainer.innerHTML = '';
     const categories = goods.map((g) => g.main_category);
     const uniqueCategories = [...new Set(categories)];
-    sidebarCategoriesContainer.innerHTML = '';
 
     uniqueCategories.forEach((cat) => {
         const div = document.createElement('div');
@@ -72,6 +79,7 @@ function generateCategoryCheckboxes(goods) {
     });
 }
 
+// Отрисовка карточек
 function renderGoods(goods) {
     goodsContainer.innerHTML = '';
 
@@ -91,8 +99,6 @@ function renderGoods(goods) {
 
         col.innerHTML = `
       <div class="card h-100 shadow-sm d-flex flex-column">
-        <!-- Если вы используете фиксированный размер, 
-             замените class="card-img-top" на class="fixed-size-img" -->
         <img 
           src="${item.image_url}" 
           class="card-img-top" 
@@ -101,7 +107,6 @@ function renderGoods(goods) {
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">${item.name}</h5>
           <p class="card-text">Рейтинг: ${item.rating}</p>
-          <!-- Блок снизу (цена и кнопка) -->
           <div class="mt-auto">
             <p class="card-text">${priceBlock}</p>
             <button class="btn btn-primary" data-good-id="${item.id}">
@@ -115,6 +120,7 @@ function renderGoods(goods) {
     });
 }
 
+// Применить фильтры
 function applyFilters() {
     const checkedCats = Array.from(
         document.querySelectorAll('input[name="category"]:checked')
@@ -122,9 +128,7 @@ function applyFilters() {
 
     const priceFrom = parseInt(priceFromInput.value, 10);
     const priceTo = parseInt(priceToInput.value, 10);
-
     const discountOnly = discountOnlyCheckbox.checked;
-
     const sortValue = sortSelect.value;
 
     let filtered = allGoods.slice();
@@ -179,6 +183,7 @@ function applyFilters() {
     renderGoods(filtered);
 }
 
+// Добавить в корзину
 function addToCart(goodId) {
     const id = parseInt(goodId, 10);
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -187,19 +192,29 @@ function addToCart(goodId) {
     showNotification(`Товар (ID=${id}) добавлен в корзину!`);
 }
 
+// При загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     fetchAllGoods();
     loadMoreBtn.style.display = 'none';
 });
 
+// Нажатие «Применить» фильтры
 applyFiltersBtn.addEventListener('click', () => {
     applyFilters();
 });
 
+// Нажатие «В корзину»
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-good-id]');
     if (btn) {
         const goodId = btn.getAttribute('data-good-id');
         addToCart(goodId);
     }
+});
+
+// Обработка формы поиска
+searchForm.addEventListener('submit', (event) => {
+    event.preventDefault();  // Отключаем перезагрузку
+    const query = searchInput.value.trim();
+    fetchAllGoods(query);    // Передаём поисковый запрос на сервер
 });

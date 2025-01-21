@@ -183,7 +183,7 @@ function applyFilters() {
     renderGoods(filtered);
 }
 
-// Добавить в корзину
+
 function addToCart(goodId) {
     const id = parseInt(goodId, 10);
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -192,18 +192,17 @@ function addToCart(goodId) {
     showNotification(`Товар (ID=${id}) добавлен в корзину!`);
 }
 
-// При загрузке страницы
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchAllGoods();
     loadMoreBtn.style.display = 'none';
 });
 
-// Нажатие «Применить» фильтры
+
 applyFiltersBtn.addEventListener('click', () => {
     applyFilters();
 });
 
-// Нажатие «В корзину»
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-good-id]');
     if (btn) {
@@ -212,9 +211,9 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Обработка формы поиска
+
 searchForm.addEventListener('submit', (event) => {
-    event.preventDefault();  // Отключаем перезагрузку
+    event.preventDefault();
     const query = searchInput.value.trim();
-    fetchAllGoods(query);    // Передаём поисковый запрос на сервер
+    fetchAllGoods(query);
 });

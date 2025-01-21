@@ -48,9 +48,6 @@ function fetchGoodById(id) {
 }
 
 
-
-
-
 function renderCartItems() {
     const cart = getCart();
     if (cart.length === 0) {

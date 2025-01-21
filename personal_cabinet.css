@@ -29,3 +29,17 @@ header {
     margin-bottom: 1rem;
     border: 1px solid rgb(176, 216, 255);
 }
+
+.view-order-btn,
+.edit-order-btn,
+.delete-order-btn {
+    margin-right: 5px;
+}
+
+#editOrderForm .form-label {
+    font-weight: bold;
+}
+
+#editOrderForm .btn-primary {
+    width: 100%;
+}
